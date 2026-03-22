@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { PutCommand, GetCommand, ScanCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
 const docClient = require("../db/dynamo");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 
 const TABLE = "Books";
 
@@ -10,7 +10,7 @@ const TABLE = "Books";
 router.post("/", async (req, res) => {
   const { title, author, genre, totalCopies } = req.body;
   const item = {
-    bookId: uuidv4(),
+    bookId: crypto.randomUUID(),
     title, author, genre,
     totalCopies: Number(totalCopies),
     availableCopies: Number(totalCopies)

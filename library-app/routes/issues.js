@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { PutCommand, ScanCommand, UpdateCommand, GetCommand } = require("@aws-sdk/lib-dynamodb");
 const docClient = require("../db/dynamo");
-const { v4: uuidv4 } = require("uuid");
+const crypto = require("crypto");
 
 //issue a book
 router.post("/", async (req, res) => {
@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
 
   //create issue record
   const issue = {
-    issueId: uuidv4(),
+    issueId: crypto.randomUUID(),
     bookId, memberId, memberName,
     bookTitle: book.title,
     issueDate: new Date().toISOString().split("T")[0],
