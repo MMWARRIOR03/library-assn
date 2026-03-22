@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Library Management System</title>
+  <style>
+    body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
+    input, button { margin: 5px; padding: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #4a90d9; color: white; }
+    .section { background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>📚 Library Management System</h1>
+
+  <div class="section">
+    <h2>Add Book</h2>
+    <input id="title" placeholder="Title">
+    <input id="author" placeholder="Author">
+    <input id="genre" placeholder="Genre">
+    <input id="copies" placeholder="Copies" type="number">
+    <button onclick="addBook()">Add Book</button>
+  </div>
+
+  <div class="section">
+    <h2>All Books</h2>
+    <button onclick="loadBooks()">Refresh</button>
+    <table id="booksTable">
+      <tr><th>Title</th><th>Author</th><th>Genre</th><th>Available</th><th>Total</th></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Issue Book</h2>
+    <input id="issueBookId" placeholder="Book ID">
+    <input id="memberId" placeholder="Member ID">
+    <input id="memberName" placeholder="Member Name">
+    <button onclick="issueBook()">Issue</button>
+  </div>
+
+  <div class="section">
+    <h2>Return Book</h2>
+    <input id="returnIssueId" placeholder="Issue ID">
+    <button onclick="returnBook()">Return</button>
+  </div>
+
+  <div class="section">
+    <h2>Issued Records</h2>
+    <button onclick="loadIssues()">Refresh</button>
+    <table id="issuesTable">
+      <tr><th>Issue ID</th><th>Book</th><th>Member</th><th>Issue Date</th><th>Status</th></tr>
+    </table>
+  </div>
+
+<script>
+  const API = "";
+
+  async function addBook() {
+    const body = { title: document.getElementById("title").value, author: document.getElementById("author").value, genre: document.getElementById("genre").value, totalCopies: document.getElementById("copies").value };
+    const r = await fetch(`${API}/api/books`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    alert((await r.json()).message); loadBooks();
+  }
+
+  async function loadBooks() {
+    const books = await (await fetch(`${API}/api/books`)).json();
+    const table = document.getElementById("booksTable");
+    table.innerHTML = "<tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th>Available</th><th>Total</th></tr>";
+    books.forEach(b => table.innerHTML += `<tr><td>${b.bookId}</td><td>${b.title}</td><td>${b.author}</td><td>${b.genre}</td><td>${b.availableCopies}</td><td>${b.totalCopies}</td></tr>`);
+  }
+
+  async function issueBook() {
+    const body = { bookId: document.getElementById("issueBookId").value, memberId: document.getElementById("memberId").value, memberName: document.getElementById("memberName").value };
+    const r = await fetch(`${API}/api/issues`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    alert((await r.json()).message || (await r.json()).error); loadIssues();
+  }
+
+  async function returnBook() {
+    const id = document.getElementById("returnIssueId").value;
+    const r = await fetch(`${API}/api/issues/return/${id}`, { method: "PUT" });
+    alert((await r.json()).message); loadIssues();
+  }
+
+  async function loadIssues() {
+    const issues = await (await fetch(`${API}/api/issues`)).json();
+    const table = document.getElementById("issuesTable");
+    table.innerHTML = "<tr><th>Issue ID</th><th>Book</th><th>Member</th><th>Issue Date</th><th>Status</th></tr>";
+    issues.forEach(i => table.innerHTML += `<tr><td>${i.issueId}</td><td>${i.bookTitle}</td><td>${i.memberName}</td><td>${i.issueDate}</td><td>${i.status}</td></tr>`);
+  }
+
+  loadBooks(); loadIssues();
+</script>
+</body>
+</html>
