@@ -54,7 +54,7 @@ router.put("/return/:issueId", async (req, res) => {
     ExpressionAttributeValues: { ":s": "returned", ":rd": new Date().toISOString().split("T")[0] }
   }));
 
-  //increment available copies
+  //increment available copy
   await docClient.send(new UpdateCommand({
     TableName: "Books",
     Key: { bookId: issue.bookId },
